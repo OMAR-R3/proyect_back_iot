@@ -34,7 +34,7 @@ export const register = async ({ username, sonName, email, password }) => {
         return mensaje(200, respuestaMongo.tipoUsuario, "", "", token);
 
     } catch (error) {
-        return mensaje(400, "error usuario no registrado 123123123", error);
+        return mensaje(400, "error usuario no registrado", error);
     }
 };
 
