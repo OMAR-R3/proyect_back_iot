@@ -22,8 +22,6 @@ export const register = async ({ username,sonName, email, password }) => {
             tipoUsuario: respuestaMongo.tipoUsuario,
             email: respuestaMongo.email
         });
-
-        //console.log("usuario guardado correctamente");
         return mensaje(200, respuestaMongo.tipoUsuario, "", "", token);
 
     } catch (error) {
@@ -45,8 +43,6 @@ export const crearUsuario = async ({ username, email, password }) => {
         const respuestaMongo = await dataUser.save();
 
         const token = await crearToken({id: respuestaMongo._id});
-
-        //console.log("usuario guardado correctamente");
         return mensaje(200, "usuario creado por admin", "", "", token);
 
     } catch (error) {
@@ -71,9 +67,6 @@ export const login = async ({ username, password }) => {
             tipoUsuario: respuestaMongo.tipoUsuario,
             email: respuestaMongo.email
         });
-        //const token = await crearToken({ id: usuarioEncontrado._id });
-
-        //console.log(mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token));
 
         return mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token);
 
@@ -97,8 +90,6 @@ export const showId = async (_id) => {
 
     try {
         const usuarioEncontrado = await User.findOne({ _id });
-        //console.log(usuarioEncontrado);
-
         if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
 
         return mensaje(200, "usuario encontrado", usuarioEncontrado);
@@ -150,20 +141,6 @@ export const updateId = async ({ _id, sonName, email, password, tipoUsuario }) =
     }
 }
 
-/*export const isAdmin = async (id)=>{
-    try {
-        const usuario = await User.findById(id);
-        if(usuario.tipoUsuario!="admin"){
-            return false;
-        }
-        else{
-            return true;
-        }
-    } catch (error) {
-        return mensaje(400,"4 Admin no autorizado",error);
-    }
-}*/
-
 export const isAdmin = async (id) => {
     try {
         const usuario = await User.findById(id);
@@ -181,8 +158,8 @@ export const isAdmin = async (id) => {
 
 export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/ longitud,latitud}) => {
     try {
-        const usuarioEncontrado = await User.findOne({ idUsuario });
-        const dispositivoEncontrado = await User.findOne({ idDispositivo });//hacer funcion de buscar dispositivo
+        const usuarioEncontrado = await Ubication.findOne({ idUsuario });
+        const dispositivoEncontrado = await Ubication.findOne({ idDispositivo });//hacer funcion de buscar dispositivo
 
         if (usuarioEncontrado || dispositivoEncontrado) { return mensaje(400, "no es posible el registro usuario o dispositivo inexistentes") };
 
@@ -190,11 +167,10 @@ export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/
 
         const respuestaMongo = await dataDispo.save();
 
-        //console.log("usuario guardado correctamente");
         return mensaje(200, "datos de ubicacion guardados", "", "", "");
 
     } catch (error) {
-        return mensaje(400, "error usuario no registrado", error);
+        return mensaje(400, "error ubicacion no registrado", error);
 
     }
 }
@@ -202,9 +178,9 @@ export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/
 
 export const showUbication = async () => {
     try {
-        const ubicaciones = await User.find().lean();
-        if (!usuarios.length) { return mensaje(400, "no se encontraron usuarios") }
-        return mensaje(200, "usuarios encontrados", usuarios)
+        const ubicaciones = await Ubication.find().lean();
+        if (!ubicaciones.length) { return mensaje(400, "no se encontraron usuarios") }
+        return mensaje(200, "ubicaciones encontradas", ubicaciones)
     } catch (error) {
         return mensaje(400, "error al traer los registros", error);
     }
@@ -213,9 +189,9 @@ export const showUbication = async () => {
 export const showUbicationId = async (_id) => {
 
     try {
-        const usuarioEncontrado = await User.findOne({ _id });
+        const ubicacionEncontrado = await Ubication.findOne({ _id });
 
-        if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
+        if (!ubicacionEncontrado) { return mensaje(400, "ubicacion no encontrada") }
 
         return mensaje(200, "usuario encontrado", usuarioEncontrado);
     } catch (error) {
