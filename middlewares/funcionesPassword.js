@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { mensaje } from "../libs/mensajes.js";
 import { showId } from "../db/usuariosDB.js";
+import exp from "constants";
 
 export function encriptarPassword(password) {
     const salt = crypto.randomBytes(32).toString("hex");
@@ -73,7 +74,9 @@ export async function adminAutorizado(req) {
     return mensaje(200, "3 Admin autorizado");
 }
 
-
+export async function Hola() {
+    console.log("Hola Omar");
+}
 
 
 /*const {salt,hash} = encriptarPassword("abc");
