@@ -119,5 +119,9 @@ router.get("/showId/:id", async (req, res) => {
         datos: respuesta.datos || null,  // Si hay datos, se devuelven; si no, se pasa null.
     });
 });
+router.get("/showId/:id", async (req, res) => {
 
+    console.log("pueba 1");
+  
+});
 export default router;
