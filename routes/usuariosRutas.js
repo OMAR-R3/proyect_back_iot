@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId, crearUsuario,ubicationRegister} from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId, crearUsuario, ubicationRegister, showUbication, showUbicationId } from "../db/usuariosDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
@@ -64,7 +64,7 @@ router.get("/usuariosLogueados", async (req, res) => {
 });
 
 
-router.get("/administradores", async(req, res) => {
+router.get("/administradores", async (req, res) => {
     //console.log("Cookies recibidas en la solicitud:");
     //console.log(req.cookies.token);
     const respuesta = await adminAutorizado(req);
@@ -79,7 +79,7 @@ router.get("/cualquierUsuario", async (req, res) => {
 
 
 
-router.post("/ingresarUbicacion", async(req,res)=>{
+router.post("/ingresarUbicacion", async (req, res) => {
     const respuesta = await ubicationRegister(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 })
@@ -87,7 +87,7 @@ router.post("/ingresarUbicacion", async(req,res)=>{
 
 //faltantes
 router.get("/ubicationShow", async (req, res) => {
-    const respuesta = await show();
+    const respuesta = await showUbication();
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,
@@ -96,7 +96,7 @@ router.get("/ubicationShow", async (req, res) => {
 
 router.get("/showId/:id", async (req, res) => {
 
-    const respuesta = await showId(req.params.id);
+    const respuesta = await showUbicationId(req.params.id);
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,

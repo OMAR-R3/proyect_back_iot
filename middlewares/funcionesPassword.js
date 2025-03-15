@@ -4,7 +4,6 @@ import "dotenv/config";
 import { mensaje } from "../libs/mensajes.js";
 import { showId } from "../db/usuariosDB.js";
 import exp from "constants";
-
 export function encriptarPassword(password) {
     const salt = crypto.randomBytes(32).toString("hex");
     const hash = crypto.scryptSync(password, salt, 10, 64, "sha512").toString("hex");
@@ -29,9 +28,6 @@ export async function usuarioAutorizado(token, req) {
         req.usuario = usuario;
     });
 }
-
-
-
 
 export async function adminAutorizado(req) {
     const respuesta = await usuarioAutorizado(req.cookies.token, req);

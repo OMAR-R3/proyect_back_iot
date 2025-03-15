@@ -31,8 +31,6 @@ export const register = async ({ username,sonName, email, password }) => {
 }
 
 
-
-
 export const crearUsuario = async ({ username, email, password }) => {
     try {
         const usuarioDuplicado = await User.findOne({ username });
@@ -155,7 +153,6 @@ export const isAdmin = async (id) => {
 
 //ubicaciones
 
-
 export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/ longitud,latitud}) => {
     try {
         const usuarioEncontrado = await Ubication.findOne({ idUsuario });
@@ -175,7 +172,6 @@ export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/
     }
 }
 
-
 export const showUbication = async () => {
     try {
         const ubicaciones = await Ubication.find().lean();
@@ -190,11 +186,9 @@ export const showUbicationId = async (_id) => {
 
     try {
         const ubicacionEncontrado = await Ubication.findOne({ _id });
-
         if (!ubicacionEncontrado) { return mensaje(400, "ubicacion no encontrada") }
-
-        return mensaje(200, "usuario encontrado", usuarioEncontrado);
+        return mensaje(200, "ubicacion encontrada", usuarioEncontrado);
     } catch (error) {
-        return mensaje(400, "error al buscar usuario", error);
+        return mensaje(400, "error al buscar ubicacion", error);
     }
 }
