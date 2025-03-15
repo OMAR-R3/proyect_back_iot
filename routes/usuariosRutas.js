@@ -7,20 +7,12 @@ import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPass
 router.post("/registro", async (req, res) => {
     const respuesta = await register(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
-    //console.log(req.cookies);
 });
 
 router.post("/crearUsuario", async (req, res) => {
     const respuesta = await crearUsuario(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
-    //console.log(req.cookies);
 });
-
-/*router.post("/login", async (req, res) => {
-    const respuesta = await login(req.body);
-    console.log(respuesta.mensajeOriginal);
-    res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
-});*/
 
 router.post("/login", async (req, res) => {
     console.log(req.body);
@@ -33,22 +25,19 @@ router.get("/show", async (req, res) => {
     const respuesta = await show();
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
-        datos: respuesta.datos || null,  // Si hay datos, se devuelven; si no, se pasa null.
+        datos: respuesta.datos || null,
     });
 });
 
 router.get("/showId/:id", async (req, res) => {
-    //console.log(req.params.id);
-
     const respuesta = await showId(req.params.id);
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
-        datos: respuesta.datos || null,  // Si hay datos, se devuelven; si no, se pasa null.
+        datos: respuesta.datos || null,
     });
 });
 
 router.delete("/deleteId/:id", async (req, res) => {
-    //console.log(req.params.id);
     const respuesta = await deleteId(req.params.id);
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
@@ -74,12 +63,6 @@ router.get("/usuariosLogueados", async (req, res) => {
     res.status(respuesta.status).json(respuesta.mensajeUsuario);
 });
 
-
-/*router.get("/administradores",async(req,res)=>{
-    const respuesta = await adminAutorizado(req);
-    console.log(respuesta);
-    res.status(respuesta.status).json(respuesta.mensajeUsuario);
-});*/
 
 router.get("/administradores", async(req, res) => {
     //console.log("Cookies recibidas en la solicitud:");
@@ -107,7 +90,7 @@ router.get("/ubicationShow", async (req, res) => {
     const respuesta = await show();
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
-        datos: respuesta.datos || null,  // Si hay datos, se devuelven; si no, se pasa null.
+        datos: respuesta.datos || null,
     });
 });
 
@@ -116,7 +99,7 @@ router.get("/showId/:id", async (req, res) => {
     const respuesta = await showId(req.params.id);
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
-        datos: respuesta.datos || null,  // Si hay datos, se devuelven; si no, se pasa null.
+        datos: respuesta.datos || null,
     });
 });
 
