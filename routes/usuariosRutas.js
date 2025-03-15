@@ -5,6 +5,7 @@ const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
 
 router.post("/registro", async (req, res) => {
+    
     const respuesta = await register(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });

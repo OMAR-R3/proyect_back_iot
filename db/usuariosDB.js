@@ -1,18 +1,21 @@
 import User from "../models/usuarioModelo.js";
-import Ubication from "../models/ubicacionesModelo.js";
 import { mensaje } from "../libs/mensajes.js";
 import { crearToken } from "../libs/jwt.js";
+import nodemailer from "nodemailer";
 import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
 
 
-
-export const register = async ({ username,sonName, email, password }) => {
+export const register = async ({ username, sonName, email, password }) => {
     try {
         const usuarioDuplicado = await User.findOne({ username });
         const emailDuplicado = await User.findOne({ email });
         if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "usuario existente") };
+
+        // se guarda entes de encriptar
+        const passwordOriginal = password;
+
         const { salt, hash } = encriptarPassword(password);
-        const dataUser = new User({ username, sonName,email, password: hash, salt });
+        const dataUser = new User({ username, sonName, email, password: hash, salt });
         const respuestaMongo = await dataUser.save();
 
         const token = await crearToken({
@@ -22,13 +25,42 @@ export const register = async ({ username,sonName, email, password }) => {
             tipoUsuario: respuestaMongo.tipoUsuario,
             email: respuestaMongo.email
         });
+
+        //enviar correo
+        await enviarCorreoRegistro(email, username, passwordOriginal);
+
+
+
         return mensaje(200, respuestaMongo.tipoUsuario, "", "", token);
 
     } catch (error) {
-        return mensaje(400, "error usuario no registrado", error);
-
+        return mensaje(400, "error usuario no registrado 123123123", error);
     }
-}
+};
+
+const enviarCorreoRegistro = async (email, username, password) => {
+
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "ka1z3n65@gmail.com",
+            pass: "dsewwbkgjkckefuo"
+        }
+    });
+    const mailOptions = {
+        from: "ka1z3n65@gmail.com",
+        to: email,
+        subject: "Registro exitoso",
+        text: `Hola ${username},\n\nTu cuenta ha sido creada con éxito.\n\nUsuario: ${username}\nContraseña: ${password}\n\nSaludos, Equipo de SNAPI.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.log(error);
+    }
+
+};
 
 
 export const crearUsuario = async ({ username, email, password }) => {
@@ -37,10 +69,10 @@ export const crearUsuario = async ({ username, email, password }) => {
         const emailDuplicado = await User.findOne({ email });
         if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "usuario existente") };
         const { salt, hash } = encriptarPassword(password);
-        const dataUser = new User({ username, sonName,email, password: hash, salt });
+        const dataUser = new User({ username, sonName, email, password: hash, salt });
         const respuestaMongo = await dataUser.save();
 
-        const token = await crearToken({id: respuestaMongo._id});
+        const token = await crearToken({ id: respuestaMongo._id });
         return mensaje(200, "usuario creado por admin", "", "", token);
 
     } catch (error) {
@@ -68,7 +100,7 @@ export const login = async ({ username, password }) => {
 
         return mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token);
 
-        
+
     } catch (error) {
         return mensaje(400, "error al logearse", error);
     }
@@ -153,14 +185,14 @@ export const isAdmin = async (id) => {
 
 //ubicaciones
 
-export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/ longitud,latitud}) => {
+export const ubicationRegister = async ({ idDispositivo, idUsuario, /*dateTime,*/ longitud, latitud }) => {
     try {
         const usuarioEncontrado = await Ubication.findOne({ idUsuario });
         const dispositivoEncontrado = await Ubication.findOne({ idDispositivo });//hacer funcion de buscar dispositivo
 
         if (usuarioEncontrado || dispositivoEncontrado) { return mensaje(400, "no es posible el registro usuario o dispositivo inexistentes") };
 
-        const dataDispo = new Ubication({ idUsuario, idDispositivo,/* dateTime,*/ longitud,latitud});
+        const dataDispo = new Ubication({ idUsuario, idDispositivo,/* dateTime,*/ longitud, latitud });
 
         const respuestaMongo = await dataDispo.save();
 
