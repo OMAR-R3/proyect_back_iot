@@ -3,7 +3,7 @@ import { mensaje } from "../libs/mensajes.js";
 import { crearToken } from "../libs/jwt.js";
 import nodemailer from "nodemailer";
 import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
-
+import QRCode from "qrcode";
 
 export const register = async ({ username, sonName, email, password }) => {
     try {
@@ -39,7 +39,6 @@ export const register = async ({ username, sonName, email, password }) => {
 };
 
 const enviarCorreoRegistro = async (email, username, password) => {
-
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -47,20 +46,40 @@ const enviarCorreoRegistro = async (email, username, password) => {
             pass: "dsewwbkgjkckefuo"
         }
     });
+
+    const datos = JSON.stringify({ email, password });
+    const qrCode = await QRCode.toDataURL(datos);
+    const imgBuffer = Buffer.from(qrCode.split(",")[1], 'base64');
+
     const mailOptions = {
         from: "ka1z3n65@gmail.com",
         to: email,
         subject: "Registro exitoso",
-        text: `Hola ${username},\n\nTu cuenta ha sido creada con éxito.\n\nUsuario: ${username}\nContraseña: ${password}\n\nSaludos, Equipo de SNAPI.`
+        html: `
+            <p>Hola ${username},</p>
+            <p>Tu cuenta ha sido creada con éxito.</p>
+            <p><strong>Usuario:</strong> ${username}</p>
+            <p><strong>Contraseña:</strong> ${password}</p>
+            <p>También puedes escanear el siguiente código QR para acceder rápidamente a tu cuenta:</p>
+            <img src="cid:qrcode" alt="Código QR" style="width: 150px; height: 150px;" />
+            <p>Saludos,<br>Equipo de SNAPI</p>
+        `,
+        attachments: [
+            {
+                filename: 'qrcode.png',
+                content: imgBuffer,
+                cid: 'qrcode'
+            }
+        ]
     };
 
     try {
         await transporter.sendMail(mailOptions);
     } catch (error) {
-        console.log(error);
+        console.log("Error al enviar el correo:", error);
     }
-
 };
+
 
 export const crearUsuario = async ({ username, email, password }) => {
     try {
