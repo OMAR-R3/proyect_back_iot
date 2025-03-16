@@ -29,8 +29,6 @@ export const register = async ({ username, sonName, email, password }) => {
         //enviar correo
         await enviarCorreoRegistro(email, username, passwordOriginal);
 
-
-
         return mensaje(200, respuestaMongo.tipoUsuario, "", "", token);
 
     } catch (error) {
@@ -81,7 +79,7 @@ const enviarCorreoRegistro = async (email, username, password) => {
 };
 
 
-export const crearUsuario = async ({ username, email, password }) => {
+/*export const crearUsuario = async ({ username, email, password }) => {
     try {
         const usuarioDuplicado = await User.findOne({ username });
         const emailDuplicado = await User.findOne({ email });
@@ -97,28 +95,22 @@ export const crearUsuario = async ({ username, email, password }) => {
         return mensaje(400, "error usuario no registrado", error);
 
     }
-}
+}*/
 
-export const login = async ({ username, password }) => {
+export const login = async ({ email, password }) => {
     try {
-        const usuarioEncontrado = await User.findOne({ username });
-
+        const usuarioEncontrado = await User.findOne({ email });
         if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
-
         const passwordValido = validarPassword(password, usuarioEncontrado.salt, usuarioEncontrado.password);
         if (!passwordValido) { return mensaje(400, "password incorrecto") }
-
         const token = await crearToken({
-            id: respuestaMongo._id,
-            username: respuestaMongo.username,
-            sonName: respuestaMongo.sonName,
-            tipoUsuario: respuestaMongo.tipoUsuario,
-            email: respuestaMongo.email
+            id: usuarioEncontrado._id,
+            username: usuarioEncontrado.username,
+            sonName: usuarioEncontrado.sonName,
+            tipoUsuario: usuarioEncontrado.tipoUsuario,
+            email: usuarioEncontrado.email
         });
-
         return mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token);
-
-
     } catch (error) {
         return mensaje(400, "error al logearse", error);
     }
@@ -147,7 +139,6 @@ export const showId = async (_id) => {
 }
 
 export const deleteId = async (_id) => {
-    //console.log(_id);
     try {
         const usuarioEncontrado = await User.findOne({ _id });
         if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }

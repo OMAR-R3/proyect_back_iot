@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId, crearUsuario, ubicationRegister, showUbication, showUbicationId } from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId, /*crearUsuario,*/ ubicationRegister, showUbication, showUbicationId } from "../db/usuariosDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
@@ -87,7 +87,7 @@ router.post("/ingresarUbicacion", async (req, res) => {
 
 
 //faltantes
-router.get("/ubicationShow", async (req, res) => {
+/*router.get("/ubicationShow", async (req, res) => {
     const respuesta = await showUbication();
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
@@ -102,6 +102,6 @@ router.get("/showId/:id", async (req, res) => {
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,
     });
-});
+});*/
 
 export default router;
