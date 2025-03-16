@@ -392,7 +392,6 @@ const enviarCorreoUpdateAdmin= async (email, password) => {
             <p>Hola,</p>
             <p>Su cuenta ha sido actualizada con éxito.</p>
             <p><strong>Su nueva es contraseña:</strong> ${password}</p>
-            <p>Su nuevo QR es:</p>
             <p>Saludos,<br>Equipo de SNAPI</p>
         `,
     };
@@ -426,7 +425,7 @@ export const showAdmins = async () => {
     try {
         const admins = await Admin.find().lean();
         if (!admins.length) { return mensaje(400, "no se encontraron administradores") }
-        return mensaje(200, "administradores encontrados", usuarios)
+        return mensaje(200, "administradores encontrados", admins)
     } catch (error) {
         return mensaje(400, "error al traer los registros", error);
     }
@@ -438,7 +437,7 @@ export const showIdAdmin = async (_id) => {
         const adminEncontrado = await Admin.findOne({ _id });
         if (!adminEncontrado) { return mensaje(400, "admin no encontrado") }
 
-        return mensaje(200, "admin encontrado", usuarioEncontrado);
+        return mensaje(200, "admin encontrado", adminEncontrado);
     } catch (error) {
         return mensaje(400, "error al buscar admin", error);
     }
@@ -460,30 +459,29 @@ export const deleteIdAdmin = async (_id) => {
 
 export const updateIdAdmin = async ({ _id, email, password}) => {
     try {
+        
         const adminEncontrado = await Admin.findOne({ _id });
+        
         if (!adminEncontrado) {
             return mensaje(400, "Administrador no encontrado");
         }
-        if (adminEncontrado.username !== username) {
-            const adminDuplicado = await Admin.findOne({ username });
-            if (adminDuplicado) { return mensaje(400, "nombre de administrador existente") };
-        };
+        
         if (adminEncontrado.email !== email) {
             const emailDuplicado = await Admin.findOne({ email });
             if (emailDuplicado) { return mensaje(400, "email de administrador existente") };
         };
-
+        
         const passwordOriginal = password;
-
-        await enviarCorreoUpdate(email, passwordOriginal);
-
+        
+        await enviarCorreoUpdateAdmin(email, passwordOriginal);
+        
         const { salt, hash } = encriptarPassword(password);
         const dataAdmin = { email, password: hash, salt };
-
+        
         const adminActualizado = await Admin.findByIdAndUpdate(_id, dataAdmin, { new: true });//{ new: true } para que MongoDB devuelva el documento actualizado, no el original.
-
+        
         if (!adminActualizado) { return mensaje(400, "Administrador no actualizado") }
-
+        
         return mensaje(200, "Administrador actualizado correctamente");
     } catch (error) {
         console.log("Error al intentar actualizar datos:", error);
