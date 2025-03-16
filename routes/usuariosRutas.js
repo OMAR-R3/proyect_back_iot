@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId, /*crearUsuario,*/ ubicationRegister, showUbication, showUbicationId } from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId, /*crearUsuario,*/ ubicationRegister, showUbication, showUbicationId, registerAdmin,showAdmins,showIdAdmin,deleteIdAdmin,updateIdAdmin, loginAdmin} from "../db/usuariosDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
@@ -103,5 +103,54 @@ router.get("/showId/:id", async (req, res) => {
         datos: respuesta.datos || null,
     });
 });*/
+
+
+//admins
+
+router.post("/registroAdmin", async (req, res) => {
+    
+    const respuesta = await registerAdmin(req.body);
+    res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
+});
+
+
+router.post("/loginAdmin", async (req, res) => {
+    console.log(req.body);
+    const respuesta = await loginAdmin(req.body);
+    res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
+
+});
+
+router.get("/showAdmins", async (req, res) => {
+    const respuesta = await showAdmins();
+    console.log(respuesta.mensajeOriginal);
+    res.status(respuesta.status).json({
+        datos: respuesta.datos || null,
+    });
+});
+
+router.get("/showIdAdmin/:id", async (req, res) => {
+    const respuesta = await showIdAdmin(req.params.id);
+    console.log(respuesta.mensajeOriginal);
+    res.status(respuesta.status).json({
+        datos: respuesta.datos || null,
+    });
+});
+
+router.delete("/deleteIdAdmin/:id", async (req, res) => {
+    const respuesta = await deleteIdAdmin(req.params.id);
+    console.log(respuesta.mensajeOriginal);
+    res.status(respuesta.status).json({
+        mensaje: respuesta.mensajeUsuario
+    });
+});
+
+router.patch("/updateIdAdmin", async (req, res) => {
+    const respuesta = await updateIdAdmin(req.body);
+    console.log(respuesta.mensajeOriginal);
+    res.status(respuesta.status).json({
+        mensaje: respuesta.mensajeUsuario
+    });
+});
 
 export default router;
