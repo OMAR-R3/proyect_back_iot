@@ -216,24 +216,10 @@ export const showUbication = async () => {
 export const showUbicationId = async (_id) => {
 
     try {
-        const ubicacionEncontrado = await Ubication.findOne({ _id });
-        if (!ubicacionEncontrado) { return mensaje(400, "ubicacion no encontrada") }
-        return mensaje(200, "ubicacion encontrada", usuarioEncontrado);
+        const ubicacionEncontrada = await Ubication.findOne({ _id });
+        if (!ubicacionEncontrada) { return mensaje(400, "ubicacion no encontrada") }
+        return mensaje(200, "ubicacion encontrada", ubicacionEncontrada);
     } catch (error) {
         return mensaje(400, "error al buscar ubicacion", error);
-    }
-}
-
-export const deleteUbicationId = async (_id) => {
-    //console.log(_id);
-    try {
-        const usuarioEncontrado = await User.findOne({ _id });
-        if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }            //verificar si es necesario
-        const usuarioEliminado = await User.findByIdAndDelete({ _id });
-        if (!usuarioEliminado) { return mensaje(400, "usuario no eliminado") }
-        return mensaje(200, `Usuario ${usuarioEncontrado.username} eliminado correctamente`);
-    }
-    catch (error) {
-        return mensaje(400, "error al buscar usuario", error);
     }
 }
