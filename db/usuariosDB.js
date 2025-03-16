@@ -355,10 +355,6 @@ const enviarCorreoRegistroAdmin = async (email, username, password) => {
         }
     });
 
-    const datos = JSON.stringify({ email, password });
-    const qrCode = await QRCode.toDataURL(datos);
-    const imgBuffer = Buffer.from(qrCode.split(",")[1], 'base64');
-
     const mailOptions = {
         from: "ka1z3n65@gmail.com",
         to: email,
@@ -368,17 +364,37 @@ const enviarCorreoRegistroAdmin = async (email, username, password) => {
             <p>Tu cuenta ha sido creada con éxito.</p>
             <p><strong>Usuario:</strong> ${username}</p>
             <p><strong>Contraseña:</strong> ${password}</p>
-            <p>También puedes escanear el siguiente código QR para acceder rápidamente a tu cuenta:</p>
-            <img src="cid:qrcode" alt="Código QR" style="width: 150px; height: 150px;" />
+            <p>Saludos,<br>Equipo de SNAPI</p>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.log("Error al enviar el correo:", error);
+    }
+};
+
+const enviarCorreoUpdateAdmin= async (email, password) => {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "ka1z3n65@gmail.com",
+            pass: "dsewwbkgjkckefuo"
+        }
+    });
+
+    const mailOptions = {
+        from: "ka1z3n65@gmail.com",
+        to: email,
+        subject: "Actualización exitosa",
+        html: `
+            <p>Hola,</p>
+            <p>Su cuenta ha sido actualizada con éxito.</p>
+            <p><strong>Su nueva es contraseña:</strong> ${password}</p>
+            <p>Su nuevo QR es:</p>
             <p>Saludos,<br>Equipo de SNAPI</p>
         `,
-        attachments: [
-            {
-                filename: 'qrcode.png',
-                content: imgBuffer,
-                cid: 'qrcode'
-            }
-        ]
     };
 
     try {
@@ -435,6 +451,7 @@ export const deleteIdAdmin = async (_id) => {
 
         const adminEliminado = await Admin.findByIdAndDelete({ _id });
         if (!adminEliminado) { return mensaje(400, "admin no eliminado") }
+        await enviarCorreoDelete(adminEncontrado.email);
         return mensaje(200, `Administrador ${adminEncontrado.username} eliminado correctamente`);
     } catch (error) {
         return mensaje(400, "error al buscar administrador", error);
@@ -455,6 +472,10 @@ export const updateIdAdmin = async ({ _id, email, password}) => {
             const emailDuplicado = await Admin.findOne({ email });
             if (emailDuplicado) { return mensaje(400, "email de administrador existente") };
         };
+
+        const passwordOriginal = password;
+
+        await enviarCorreoUpdate(email, passwordOriginal);
 
         const { salt, hash } = encriptarPassword(password);
         const dataAdmin = { email, password: hash, salt };
