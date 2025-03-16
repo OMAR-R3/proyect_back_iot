@@ -86,8 +86,8 @@ router.post("/ingresarUbicacion", async (req, res) => {
 })
 
 
-//faltantes
-/*router.get("/ubicationShow", async (req, res) => {
+//ubicaciones
+router.get("/ubicationShow", async (req, res) => {
     const respuesta = await showUbication();
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
@@ -95,14 +95,14 @@ router.post("/ingresarUbicacion", async (req, res) => {
     });
 });
 
-router.get("/showId/:id", async (req, res) => {
+router.get("/showIdUbication/:id", async (req, res) => {
 
     const respuesta = await showUbicationId(req.params.id);
     console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,
     });
-});*/
+});
 
 
 //admins
