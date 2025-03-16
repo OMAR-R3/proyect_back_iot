@@ -32,9 +32,6 @@ export const register = async ({ username,sonName, email, password }) => {
     }
 }
 
-
-
-
 export const crearUsuario = async ({ username, email, password }) => {
     try {
         const usuarioDuplicado = await User.findOne({ username });
@@ -219,6 +216,20 @@ export const showUbicationId = async (_id) => {
 
         return mensaje(200, "usuario encontrado", usuarioEncontrado);
     } catch (error) {
+        return mensaje(400, "error al buscar usuario", error);
+    }
+}
+
+export const deleteUbicationId = async (_id) => {
+    //console.log(_id);
+    try {
+        const usuarioEncontrado = await User.findOne({ _id });
+        if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }            //verificar si es necesario
+        const usuarioEliminado = await User.findByIdAndDelete({ _id }); 
+        if (!usuarioEliminado) { return mensaje(400, "usuario no eliminado") }
+        return mensaje(200, `Usuario ${usuarioEncontrado.username} eliminado correctamente`);
+    }
+    catch (error) {
         return mensaje(400, "error al buscar usuario", error);
     }
 }
