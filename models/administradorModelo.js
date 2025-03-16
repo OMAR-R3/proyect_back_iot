@@ -1,16 +1,11 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({//esta bien
+const adminSchema = new mongoose.Schema({//esta bien
     username: {
         type: String,
         required: true,
         trim: true,
         unique: true
-    },
-    sonName: {
-        type: String,
-        required: true,
-        trim: true
     },
     email: {
         type: String,
@@ -22,6 +17,10 @@ const userSchema = new mongoose.Schema({//esta bien
         type: String,
         required: true
     },
+    tipoUsuario: {
+        type: String,
+        default: "admin"
+    },
     salt: {
         type: String,
         required: true
@@ -32,4 +31,4 @@ const userSchema = new mongoose.Schema({//esta bien
     }
 );
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('Admin', adminSchema);
