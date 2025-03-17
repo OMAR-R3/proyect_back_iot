@@ -5,22 +5,17 @@ import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicati
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
-
 // Rutas para gestión de usuarios
-
 // Registro de usuario
 router.post("/registro", async (req, res) => {
-
     const respuesta = await register(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
 // Creación de usuario
 router.post("/crearUsuario", async (req, res) => {
     const respuesta = await crearUsuario(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
 // Inicio de sesión de usuario
 router.post("/login", async (req, res) => {
     console.log(req.body);
@@ -28,7 +23,6 @@ router.post("/login", async (req, res) => {
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 
 });
-
 // Obtener todos los usuarios
 router.get("/show", async (req, res) => {
     const respuesta = await show();
@@ -37,7 +31,6 @@ router.get("/show", async (req, res) => {
         datos: respuesta.datos || null,
     });
 });
-
 // Obtener un usuario por ID
 router.get("/showId/:id", async (req, res) => {
     const respuesta = await showId(req.params.id);
@@ -46,7 +39,6 @@ router.get("/showId/:id", async (req, res) => {
         datos: respuesta.datos || null,
     });
 });
-
 // Eliminar usuario por ID
 router.delete("/deleteId/:id", async (req, res) => {
     const respuesta = await deleteId(req.params.id);
@@ -63,19 +55,16 @@ router.patch("/updateId", async (req, res) => {
         mensaje: respuesta.mensajeUsuario
     });
 });
-
 // Cerrar sesión
 router.get("/salir", async (req, res) => {
     res.cookie('token', '', { expires: new Date(0) }).clearCookie('token').status(200).json("Cerraste sesión correctamente");
 
 });
-
 // Ver usuarios logueados
 router.get("/usuariosLogueados", async (req, res) => {
     const respuesta = usuarioAutorizado(req.cookies.token, req);
     res.status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
 // Verificar si es un administrador autorizado
 router.get("/administradores", async (req, res) => {
     //console.log("Cookies recibidas en la solicitud:");
@@ -83,24 +72,16 @@ router.get("/administradores", async (req, res) => {
     const respuesta = await adminAutorizado(req);
     res.status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
-
 // Ruta accesible sin autenticación
 router.get("/cualquierUsuario", async (req, res) => {
     res.json("Todos pueden usar sin loguearse");
 });
-
-
-
-
 //ubicaciones
-
 // Ruta para registrar una nueva ubicación
 router.post("/ingresarUbicacion", async (req, res) => {
     const respuesta = await ubicationRegister(req.body);
     res.status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
 // Ruta para mostrar todas las ubicaciones
 router.get("/ubicationShow", async (req, res) => {
     const respuesta = await showUbication();
@@ -108,7 +89,6 @@ router.get("/ubicationShow", async (req, res) => {
         datos: respuesta.datos || null,
     });
 });
-
 // Ruta para mostrar una ubicación específica por ID
 router.get("/showIdUbication/:id", async (req, res) => {
     const respuesta = await showUbicationId(req.params.id);
@@ -116,9 +96,6 @@ router.get("/showIdUbication/:id", async (req, res) => {
         datos: respuesta.datos || null,
     });
 });
-
-
-
 //admins
 // Registro de administrador
 router.post("/registroAdmin", async (req, res) => {
@@ -126,7 +103,6 @@ router.post("/registroAdmin", async (req, res) => {
     const respuesta = await registerAdmin(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });
-
 // Inicio de sesión de administrador
 router.post("/loginAdmin", async (req, res) => {
     console.log(req.body);
@@ -166,5 +142,4 @@ router.patch("/updateIdAdmin", async (req, res) => {
         mensaje: respuesta.mensajeUsuario
     });
 });
-
 export default router;
