@@ -15,7 +15,7 @@ conexionBD();
 
 // Configuración correcta de CORS para permitir cookies
 app.use(cors({
-    origin: true, // segun el front
+    origin: true, // Según el front
     credentials: true
 }));
 
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", usuariosRutas);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`)
-});
+// Exporta la función para que Vercel pueda manejarla
+export default (req, res) => {
+    app(req, res); // Esto maneja la solicitud a través de Express
+};
