@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId} from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId } from "../db/usuariosDB.js";
 import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/administradoresDB.js";
 import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicationDB.js";
 import { log } from "console";
@@ -99,10 +99,12 @@ router.get("/showIdUbication/:id", async (req, res) => {
 //admins
 // Registro de administrador
 router.post("/registroAdmin", async (req, res) => {
-
+    console.log("1");
     const respuesta = await registerAdmin(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });
+
+
 // Inicio de sesión de administrador
 router.post("/loginAdmin", async (req, res) => {
     console.log(req.body);
