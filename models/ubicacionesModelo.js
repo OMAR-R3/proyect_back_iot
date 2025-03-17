@@ -1,31 +1,32 @@
 import mongoose from "mongoose";
 
 const ubicationSchema = new mongoose.Schema({
-
-    idUsuario:{
-        type:String,
-        required: true,
-        trim: true
-    }, 
-    /*dateTime:{
-        type:Date,
-        required: true,
-        trim: true
-    },*/ 
-    longitud:{
-        type:String,
+    idUsuario: {
+        type: String,
         required: true,
         trim: true
     },
-    latitud:{
-        type:String,
+    idDispositivo: {
+        type: String,
         required: true,
         trim: true
-    }
-},
-    {
-        timestamps: true
-    }
-);
+    },
+    puntos: [{
+        latitud: {
+            type: String,
+            required: true
+        },
+        longitud: {
+            type: String,
+            required: true
+        },
+        dateTime: {
+            type: Date,
+            default: Date.now
+        }
+    }]
+}, {
+    timestamps: true
+});
 
 export default mongoose.model('Ubication', ubicationSchema);

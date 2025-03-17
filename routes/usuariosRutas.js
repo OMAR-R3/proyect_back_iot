@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId, ubicationRegister, showUbication, showUbicationId, registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId} from "../db/usuariosDB.js";
 import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/administradoresDB.js";
+import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicationDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
@@ -88,22 +89,29 @@ router.post("/ingresarUbicacion", async (req, res) => {
 
 
 //ubicaciones
+
+// Ruta para registrar una nueva ubicación
+router.post("/ingresarUbicacion", async (req, res) => {
+    const respuesta = await ubicationRegister(req.body);
+    res.status(respuesta.status).json(respuesta.mensajeUsuario);
+});
+
+// Ruta para mostrar todas las ubicaciones
 router.get("/ubicationShow", async (req, res) => {
     const respuesta = await showUbication();
-    console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,
     });
 });
 
+// Ruta para mostrar una ubicación específica por ID
 router.get("/showIdUbication/:id", async (req, res) => {
-
     const respuesta = await showUbicationId(req.params.id);
-    console.log(respuesta.mensajeOriginal);
     res.status(respuesta.status).json({
         datos: respuesta.datos || null,
     });
 });
+
 
 
 //admins

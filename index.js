@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import usuariosRutas from "./routes/usuariosRutas.js";
 import { conectarDB } from "./db/db.js";
+import './tasks/cronTasks.js';
 
 async function conexionBD() {
     const mensajeDB = await conectarDB();
