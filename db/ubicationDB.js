@@ -1,9 +1,11 @@
 import Ubication from "../models/ubicacionesModelo.js"
 
+// Función para registrar una nueva ubicación o actualizar una existente
 export const ubicationRegister = async ({ idUsuario, idDispositivo, longitud, latitud }) => {
     try {
+        // Buscar si ya existe una ubicación registrada para el usuario y dispositivo
         const ubicacionExistente = await Ubication.findOne({ idUsuario, idDispositivo });
-
+            // Si la ubicación ya existe, agregar el nuevo punto de coordenadas con la fecha y hora actual
         if (ubicacionExistente) {
             // Agregar el nuevo punto a la ubicación existente
             ubicacionExistente.puntos.push({ latitud, longitud, dateTime: new Date() });
@@ -15,7 +17,7 @@ export const ubicationRegister = async ({ idUsuario, idDispositivo, longitud, la
                 idDispositivo,
                 puntos: [{ latitud, longitud, dateTime: new Date() }]
             });
-            await nuevaUbicacion.save();
+            await nuevaUbicacion.save(); // Guardar la nueva ubicación en la base de datos
         }
 
         return {
@@ -31,9 +33,10 @@ export const ubicationRegister = async ({ idUsuario, idDispositivo, longitud, la
     }
 };
 
+// Función para obtener todas las ubicaciones almacenadas en la base de datos
 export const showUbication = async () => {
     try {
-        const ubicaciones = await Ubication.find().lean();
+        const ubicaciones = await Ubication.find().lean(); // Obtener todas las ubicaciones y convertirlas a objetos JSON
         if (!ubicaciones.length) { 
             return { status: 400, mensajeUsuario: "No se encontraron ubicaciones" };
         }
@@ -42,10 +45,10 @@ export const showUbication = async () => {
         return { status: 500, mensajeUsuario: "Error al obtener ubicaciones", error };
     }
 };
-
+// Función para obtener una ubicación específica por su ID
 export const showUbicationId = async (_id) => {
     try {
-        const ubicacionEncontrada = await Ubication.findOne({ _id });
+        const ubicacionEncontrada = await Ubication.findOne({ _id });// Buscar ubicación por su ID
         if (!ubicacionEncontrada) { 
             return { status: 400, mensajeUsuario: "Ubicación no encontrada" };
         }
