@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { deleteId, login, register, show, showId, updateId, /*crearUsuario,*/ ubicationRegister, showUbication, showUbicationId, registerAdmin,showAdmins,showIdAdmin,deleteIdAdmin,updateIdAdmin, loginAdmin} from "../db/usuariosDB.js";
+import { deleteId, login, register, show, showId, updateId, ubicationRegister, showUbication, showUbicationId, registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/usuariosDB.js";
+import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/administradoresDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
 
 router.post("/registro", async (req, res) => {
-    
+
     const respuesta = await register(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });
@@ -108,7 +109,7 @@ router.get("/showIdUbication/:id", async (req, res) => {
 //admins
 
 router.post("/registroAdmin", async (req, res) => {
-    
+
     const respuesta = await registerAdmin(req.body);
     res.cookie("token", respuesta.token).status(respuesta.status).json(respuesta.mensajeUsuario);
 });

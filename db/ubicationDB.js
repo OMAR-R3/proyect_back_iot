@@ -1,0 +1,1 @@
+import Ubication from "../models/ubicacionesModelo.js"
