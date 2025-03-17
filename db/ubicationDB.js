@@ -1,5 +1,4 @@
-import Ubication from "../models/ubicacionesModelo.js"
-
+import Ubication from "../models/ubicacionesModelo.js";
 // Función para registrar una nueva ubicación o actualizar una existente
 export const ubicationRegister = async ({ idUsuario, idDispositivo, longitud, latitud }) => {
     try {

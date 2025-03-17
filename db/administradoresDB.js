@@ -1,4 +1,7 @@
 import Admin from "../models/administradorModelo.js"
+import { mensaje } from "../libs/mensajes.js";
+import { crearToken } from "../libs/jwt.js";
+import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
 import { enviarCorreoDelete, enviarCorreoRegistroAdmin, enviarCorreoUpdateAdmin } from "./correos.js";
 //Administradores
 //funcion para registrar administrador
