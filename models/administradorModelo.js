@@ -30,5 +30,5 @@ const adminSchema = new mongoose.Schema({//esta bien
         timestamps: true
     }
 );
-
+//Base para la creacion de administradores en la base de datos
 export default mongoose.model('Admin', adminSchema);

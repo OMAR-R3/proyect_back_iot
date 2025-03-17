@@ -9,3 +9,4 @@ export async function conectarDB() {
         return mensaje(400,"error al conectarse a la bd", error);
     }   
 }
+//Funcion para conectar con la base de Datos de Mongo Atlas

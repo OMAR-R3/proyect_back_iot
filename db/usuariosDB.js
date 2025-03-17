@@ -78,7 +78,7 @@ const enviarCorreoRegistro = async (email, username, password) => {
         console.log("Error al enviar el correo:", error);
     }
 };
-
+//Funcion que envia un correo electronico al usuario con un qr con los datos de su cuenta
 
 
 /*export const crearUsuario = async ({ username, email, password }) => {
@@ -229,7 +229,7 @@ const enviarCorreoUpdate= async (email, sonName, password) => {
         console.log("Error al enviar el correo:", error);
     }
 };
-
+//Funcion que envia un correo electronico al usuario con un qr con los datos nuevos de su cuenta
 
 const enviarCorreoDelete= async (email) => {
     const transporter = nodemailer.createTransport({
@@ -258,7 +258,7 @@ const enviarCorreoDelete= async (email) => {
         console.log("Error al enviar el correo:", error);
     }
 };
-
+//Funcion que envia un correo electronico al usuario cuando se ha eliminado
 
 /*export const isAdmin = async (id) => {
     try {
