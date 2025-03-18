@@ -1,4 +1,4 @@
-![1](https://github.com/user-attachments/assets/985e540f-5587-4b66-be9d-5fff41d3323e)index.js-archivo
+index.js-archivo
 
 ![1](https://github.com/user-attachments/assets/c40d5241-0b71-4b62-9d61-950270951f5b)
 
