@@ -1,5 +1,7 @@
 import QRCode from "qrcode";
 import nodemailer from "nodemailer";
+import { mensaje } from "../libs/mensajes.js";
+import User from "../models/usuarioModelo.js";
 //Funcion que envia un correo electronico al usuario con un qr con los datos de su cuenta al darla de alta como administrador
 export const enviarCorreoRegistro = async (email, username, password) => {
     //Se configura el transporte de correo utilizando gmail como el servicio
@@ -183,5 +185,28 @@ export const enviarCorreoUpdateAdmin = async (email, password) => {
     } catch (error) {
         //manejo de errores durante la ejecucion
         console.log("Error al enviar el correo:", error);
+    }
+};
+
+export const generarQrConId = async (id) => {
+    try {
+        const usuarioEncontradoPorId = await User.findById(id);
+        
+        // Verificamos si el usuario fue encontrado
+        if (!usuarioEncontradoPorId) {
+            return mensaje(400, "Error al encontrar al usuario");
+        }
+
+        // Formatear los datos del usuario en un objeto JSON
+        const usuariosFormateados = {
+            email: usuarioEncontradoPorId.email,
+            password: usuarioEncontradoPorId.password
+        };
+
+        // Retornamos el objeto JSON stringificado para usarlo en el QR
+        return mensaje(200, "Usuario encontrado", "","" ,JSON.stringify(usuariosFormateados));
+
+    } catch (error) {
+        return mensaje(400, "Búsqueda no realizada", error);
     }
 };
