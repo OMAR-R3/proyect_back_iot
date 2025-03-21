@@ -1,8 +1,8 @@
 //importaciones necesarias para el uso de las funciones
-import User from "../models/usuarioModelo.js"
+import User from "../models/usuarioModelo.js";
 import { mensaje } from "../libs/mensajes.js";
 import { crearToken } from "../libs/jwt.js";
-import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
+import { encriptarPassword, desencriptarPassword } from "../middlewares/funcionesPassword.js";
 import { enviarCorreoRegistro, enviarCorreoUpdate, enviarCorreoDelete } from "./correos.js";
 
 //funcion para registrar usuario(padre de familia), por parte del administrador
@@ -17,8 +17,8 @@ export const register = async ({ username, sonName, email, password }) => {
         // se guarda password entes de encriptar para pasarlo al correo
         const passwordOriginal = password;
         //encriptacion de password
-        const { salt, hash } = encriptarPassword(password);
-        const dataUser = new User({ username, sonName, email, password: hash, salt });
+        const { iv, key, encrypted } = encriptarPassword(password);
+        const dataUser = new User({ username, sonName, email, password: encrypted, iv, key });
         //resgistro de usuario en mongo
         const respuestaMongo = await dataUser.save();
         //Se crea el token para devolverlo con la informacion del usuario
@@ -45,10 +45,14 @@ export const login = async ({ email, password }) => {
         const usuarioEncontrado = await User.findOne({ email });
         //validacion de si se encontro el usuario si no se retorna un error
         if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
-        //busqueda de password
-        const passwordValido = validarPassword(password, usuarioEncontrado.salt, usuarioEncontrado.password);
+        //desencriptar password
+        const passwordDesencriptado = desencriptarPassword(
+            usuarioEncontrado.password,
+            usuarioEncontrado.iv,
+            usuarioEncontrado.key
+        );
         //validacion de si es correcto el password, de no serlo se regresa un error
-        if (!passwordValido) { return mensaje(400, "password incorrecto") }
+        if (password !== passwordDesencriptado) { return mensaje(400, "password incorrecto") }
         //Se crea el token para devolverlo con la informacion del usuario
         const token = await crearToken({
             id: usuarioEncontrado._id,
@@ -63,7 +67,6 @@ export const login = async ({ email, password }) => {
         return mensaje(400, "error al logearse", error);//en caso de fallo devuelve error
     }
 }
-
 
 //funcion para devolver todos los usuarios registrados
 export const show = async () => {
@@ -136,8 +139,8 @@ export const updateId = async ({ _id, sonName, email, password }) => {
         //envio de correo para informar la actualizacion del usuario
         await enviarCorreoUpdate(email, sonName, passwordOriginal);
         //encriptacion del password nuevo
-        const { salt, hash } = encriptarPassword(password);
-        const dataUser = { sonName, email, password: hash, salt };
+        const { iv, key, encryptedData } = encriptarPassword(password);
+        const dataUser = { sonName, email, password: encryptedData, iv, key };
         //actualizacion del usuario en la base de datos en MongoDB
         const usuarioActualizado = await User.findByIdAndUpdate(_id, dataUser, { new: true });//{ new: true } para que MongoDB devuelva el documento actualizado, no el original.
         //validacion de actualizacion

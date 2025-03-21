@@ -1,34 +1,38 @@
 import mongoose from "mongoose";
+
 // Definición del esquema para los administradores
-const adminSchema = new mongoose.Schema({//esta bien
+const adminSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true, // Campo obligatorio
-        trim: true, // Elimina espacios en blanco al inicio y final
-        unique: true // No se permiten nombres de usuario duplicados
+        required: true,
+        trim: true,
+        unique: true
     },
     email: {
         type: String,
-        required: true, // Campo obligatorio
-        trim: true, // Elimina espacios en blanco
-        unique: true // No se permiten correos electrónicos duplicados
+        required: true,
+        trim: true,
+        unique: true
     },
     password: {
         type: String,
-        required: true// Campo obligatorio (debe almacenarse encriptado)
+        required: true
     },
     tipoUsuario: {
         type: String,
-        default: "admin" // Valor predeterminado para indicar que es un administrador
+        default: "admin"
     },
-    salt: {
+    iv: { // Vector de inicialización para desencriptar
         type: String,
-        required: true // Se almacena el salt usado en la encriptación de la contraseña
+        required: true
+    },
+    key: { // Clave para desencriptar
+        type: String,
+        required: true
     }
-},
-    {
-        timestamps: true // Agrega automáticamente createdAt y updatedAt
-    }
-);
-//Base para la creacion de administradores en la base de datos
+}, {
+    timestamps: true
+});
+
+// Base para la creación de administradores en la base de datos
 export default mongoose.model('Admin', adminSchema);

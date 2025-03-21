@@ -1,144 +1,174 @@
-import Admin from "../models/administradorModelo.js"
+import Admin from "../models/administradorModelo.js";
 import { mensaje } from "../libs/mensajes.js";
 import { crearToken } from "../libs/jwt.js";
-import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
+import { encriptarPassword, validarPassword, desencriptarPassword } from "../middlewares/funcionesPassword.js";
 import { enviarCorreoDelete, enviarCorreoRegistroAdmin, enviarCorreoUpdateAdmin } from "./correos.js";
-//Administradores
-//funcion para registrar administrador
+
+// Administradores
+
+// Función para registrar administrador
 export const registerAdmin = async ({ username, email, password }) => {
     try {
-        //busqueda para verificar que no exista el administrador
+        // Búsqueda para verificar que no exista el administrador
         const usuarioDuplicado = await Admin.findOne({ username });
-        //busqueda para verificar que no exista el email
+        // Búsqueda para verificar que no exista el email
         const emailDuplicado = await Admin.findOne({ email });
-        //validacion de usuario para retornar si existe o no el administrador
-        if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "admin existente") };
-        // se guarda password entes de encriptar para pasarlo al correo
+        // Validación de usuario para retornar si existe o no el administrador
+        if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "admin existente"); }
+
+        // Se guarda password antes de encriptar para pasarlo al correo
         const passwordOriginal = password;
-        //encriptacion de password
-        const { salt, hash } = encriptarPassword(password);
-        const dataAdmin = new Admin({ username, email, password: hash, salt });
-        //resgistro de adminstrador en mongo
+
+        // Encriptación de password usando la función proporcionada
+        const { encrypted, iv, key } = encriptarPassword(password);
+
+        // Creación del objeto administrador
+        const dataAdmin = new Admin({ username, email, password: encrypted, iv, key });
+
+        // Registro de administrador en Mongo
         const respuestaMongo = await dataAdmin.save();
-        //Se crea el token para devolverlo con la informacion del administrador
+
+        // Se crea el token para devolverlo con la información del administrador
         const token = await crearToken({
             id: respuestaMongo._id,
             username: respuestaMongo.username,
             tipoUsuario: respuestaMongo.tipoUsuario,
             email: respuestaMongo.email
         });
-        //enviar correo
+
+        // Enviar correo de registro
         await enviarCorreoRegistroAdmin(email, username, passwordOriginal);
-        //retorna mensaje de exito con el token
-        return mensaje(200, "Administrador registrado con exito", "", "", token);
+
+        // Retorna mensaje de éxito con el token
+        return mensaje(200, "Administrador registrado con éxito", "", "", token);
+
     } catch (error) {
-        //manejo de errores
-        return mensaje(400, "error administrador no registrado", error);
+        // Manejo de errores
+        return mensaje(400, "Error: administrador no registrado", error);
     }
 };
-//funcion de validacion de inicio de sesion del administrador
+
+// Función de validación de inicio de sesión del administrador
 export const loginAdmin = async ({ email, password }) => {
     try {
-        //busqueda del administrador mediante el email
+        // Búsqueda del administrador mediante el email
         const adminEncontrado = await Admin.findOne({ email });
-        //validacion de si se encontro el administrador si no se retorna un error
-        if (!adminEncontrado) { return mensaje(400, "admin no encontrado") }
-        //busqueda de password
-        const passwordValido = validarPassword(password, adminEncontrado.salt, adminEncontrado.password);
-        //validacion de si es correcto el password, de no serlo se regresa un error
-        if (!passwordValido) { return mensaje(400, "password incorrecto") }
-        //Se crea el token para devolverlo con la informacion del administrador
+        // Validación de si se encontró el administrador, si no se retorna un error
+        if (!adminEncontrado) { return mensaje(400, "Admin no encontrado"); }
+
+        // Validación de password usando la función 'validarPassword'
+        const passwordValido = validarPassword(password, adminEncontrado.password, adminEncontrado.iv, adminEncontrado.key);
+
+        // Validación de si es correcto el password, de no serlo se regresa un error
+        if (!passwordValido) { return mensaje(400, "Password incorrecto"); }
+
+        // Se crea el token para devolverlo con la información del administrador
         const token = await crearToken({
             id: adminEncontrado._id,
             username: adminEncontrado.username,
             tipoUsuario: adminEncontrado.tipoUsuario,
             email: adminEncontrado.email
         });
-        //retorna mensaje de exito con el token
+
+        // Retorna mensaje de éxito con el token
         return mensaje(200, adminEncontrado.tipoUsuario, "", "", token);
+
     } catch (error) {
-        //manejo de errores
-        return mensaje(400, "error al logearse", error);
+        // Manejo de errores
+        return mensaje(400, "Error al logearse", error);
     }
-}
-//funcion para devolver todos los administradores registrados
+};
+
+// Función para devolver todos los administradores registrados
 export const showAdmins = async () => {
     try {
-        //busqueda de administradores registrados en la base de datos de Mongo Atlas convitiendolos en objeto json
+        // Búsqueda de administradores registrados en la base de datos
         const admins = await Admin.find().lean();
-        //validacion de si se econtraron o no administradores
-        if (!admins.length) { return mensaje(400, "no se encontraron administradores") }
-        //retorna mensaje de exito con la lista de administradores
-        return mensaje(200, "administradores encontrados", admins)
+        // Validación de si se encontraron o no administradores
+        if (!admins.length) { return mensaje(400, "No se encontraron administradores"); }
+        // Retorna mensaje de éxito con la lista de administradores
+        return mensaje(200, "Administradores encontrados", admins);
+
     } catch (error) {
-        //manjeo de cualquier error
-        return mensaje(400, "error al traer los registros", error);
+        // Manejo de errores
+        return mensaje(400, "Error al traer los registros", error);
     }
-}
-//funcion para buscar administradores por id
+};
+
+// Función para buscar administradores por ID
 export const showIdAdmin = async (_id) => {
     try {
-        //busqueda de administrador mediante el id proporcionado
+        // Búsqueda de administrador mediante el ID proporcionado
         const adminEncontrado = await Admin.findOne({ _id });
-        //validacion si se encontro el administrador
-        if (!adminEncontrado) { return mensaje(400, "admin no encontrado") }
-        //retorna mensaje de exito con el administrador
-        return mensaje(200, "admin encontrado", adminEncontrado);
+        // Validación si se encontró el administrador
+        if (!adminEncontrado) { return mensaje(400, "Admin no encontrado"); }
+        // Retorna mensaje de éxito con el administrador
+        return mensaje(200, "Admin encontrado", adminEncontrado);
     } catch (error) {
-        //manjeo de cualquier error
-        return mensaje(400, "error al buscar admin", error);
+        // Manejo de errores
+        return mensaje(400, "Error al buscar admin", error);
     }
-}
-//Funcion de eliminacion de administradores mediante el id
+};
+
+// Función de eliminación de administradores mediante el ID
 export const deleteIdAdmin = async (_id) => {
     try {
-        //busqueda del administrador para verificar su existencia por id
+        // Búsqueda del administrador para verificar su existencia por ID
         const adminEncontrado = await Admin.findOne({ _id });
-        //validacion de el administrador econtrado
-        if (!adminEncontrado) { return mensaje(400, "admin no encontrado") }
-        //eliminacion del administrador mediante el id
+        // Validación del administrador encontrado
+        if (!adminEncontrado) { return mensaje(400, "Admin no encontrado"); }
+        // Eliminación del administrador mediante el ID
         const adminEliminado = await Admin.findByIdAndDelete({ _id });
-        //verificacion de la eliminacion si fue o no correcta
-        if (!adminEliminado) { return mensaje(400, "admin no eliminado") }
-        //envio de correo, para informar la eliminacion de la cuenta
+        // Verificación de la eliminación si fue o no correcta
+        if (!adminEliminado) { return mensaje(400, "Admin no eliminado"); }
+        // Envío de correo para informar la eliminación de la cuenta
         await enviarCorreoDelete(adminEncontrado.email);
-        //retorna mensaje de exito de eliminacion a la consola
+        // Retorna mensaje de éxito de eliminación
         return mensaje(200, `Administrador ${adminEncontrado.username} eliminado correctamente`);
     } catch (error) {
-        //manjeo de cualquier error
-        return mensaje(400, "error al buscar administrador", error);
+        // Manejo de errores
+        return mensaje(400, "Error al buscar administrador", error);
     }
-}
-//Funcion de actualizacion de adm inistrador mediante el id
+};
+
+// Función de actualización de administrador mediante el ID
 export const updateIdAdmin = async ({ _id, email, password }) => {
     try {
-        //busqueda de administrador para validar su existencia
+        // Búsqueda de administrador para validar su existencia
         const adminEncontrado = await Admin.findOne({ _id });
-        //verificacion del administrador para continuar o retiornar error
+        // Verificación del administrador para continuar o retornar error
         if (!adminEncontrado) {
             return mensaje(400, "Administrador no encontrado");
         }
-        //verificacion del email, para revisar que el email no esta ya registrado en la base de datos
+
+        // Verificación del email para revisar que el email no está ya registrado en la base de datos
         if (adminEncontrado.email !== email) {
             const emailDuplicado = await Admin.findOne({ email });
-            //validacion de email para continuar o retiornar error
-            if (emailDuplicado) { return mensaje(400, "email de administrador existente") };
+            // Validación de email para continuar o retornar error
+            if (emailDuplicado) { return mensaje(400, "Email de administrador existente"); };
         };
-        // se guarda password entes de encriptar para pasarlo al correo
+
+        // Se guarda password antes de encriptar para pasarlo al correo
         const passwordOriginal = password;
-        //envio de correo para informar la actualizacion del administrador
+
+        // Envío de correo para informar la actualización del administrador
         await enviarCorreoUpdateAdmin(email, passwordOriginal);
-        //encriptación del password nuevo
-        const { salt, hash } = encriptarPassword(password);
-        const dataAdmin = { email, password: hash, salt };
-        //actualización del administrador en la base de datos en MongoDB
-        const adminActualizado = await Admin.findByIdAndUpdate(_id, dataAdmin, { new: true });//{ new: true } para que MongoDB devuelva el documento actualizado, no el original.
-        //validacion de actualización
-        if (!adminActualizado) { return mensaje(400, "Administrador no actualizado") }
-        //retorna mensaje de exito de actualización
+
+        // Encriptación del nuevo password usando la función proporcionada
+        const { encrypted, iv, key } = encriptarPassword(password);
+
+        const dataAdmin = { email, password: encrypted, iv, key };
+
+        // Actualización del administrador en la base de datos
+        const adminActualizado = await Admin.findByIdAndUpdate(_id, dataAdmin, { new: true });
+
+        // Validación de la actualización
+        if (!adminActualizado) { return mensaje(400, "Administrador no actualizado"); }
+
+        // Retorna mensaje de éxito de actualización
         return mensaje(200, "Administrador actualizado correctamente");
     } catch (error) {
-        //manjeo de cualquier error
-        return mensaje(400, "error al intentar actualizar datos", error);
+        // Manejo de errores
+        return mensaje(400, "Error al intentar actualizar datos", error);
     }
-}
+};

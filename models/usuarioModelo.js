@@ -1,35 +1,39 @@
 import mongoose from "mongoose";
+
 // Definición del esquema para almacenar información de usuarios
-const userSchema = new mongoose.Schema({//esta bien
+const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true, // Campo obligatorio para el nombre de usuario
-        trim: true, // Elimina espacios en blanco al inicio y final
-        unique: true // Asegura que el nombre de usuario sea único en la base de datos
+        required: true,
+        trim: true,
+        unique: true
     },
     sonName: {
         type: String,
-        required: true, // Campo obligatorio para el apellido del usuario
-        trim: true // Elimina espacios en blanco al inicio y final
+        required: true,
+        trim: true
     },
     email: {
         type: String,
-        required: true, // Campo obligatorio para el correo electrónico
-        trim: true, // Elimina espacios en blanco al inicio y final
-        unique: true // Asegura que el email sea único en la base de datos
+        required: true,
+        trim: true,
+        unique: true
     },
     password: {
         type: String,
-        required: true // Campo obligatorio para almacenar la contraseña del usuario
+        required: true
     },
-    salt: {
+    iv: { // Vector de inicialización para desencriptar
         type: String,
-        required: true // Almacena la clave de cifrado utilizada para la contraseña
+        required: true
+    },
+    key: { // Clave para desencriptar
+        type: String,
+        required: true
     }
-},
-    {
-        timestamps: true // Agrega automáticamente los campos createdAt y updatedAt
-    }
-);
-// Exporta el modelo 'User' basado en el esquema definido, para su uso en la base de datos
+}, {
+    timestamps: true
+});
+
+// Exporta el modelo 'User' basado en el esquema definido
 export default mongoose.model('User', userSchema);

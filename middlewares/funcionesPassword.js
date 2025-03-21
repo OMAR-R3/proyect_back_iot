@@ -3,26 +3,48 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { mensaje } from "../libs/mensajes.js";
 import { showId } from "../db/usuariosDB.js";
-import exp from "constants";
 
-// Función para encriptar contraseñas
+// 🔒 Algoritmo y clave para AES
+const algorithm = 'aes-256-cbc';
+const key = crypto.randomBytes(32); // Clave de 32 bytes para AES-256
+const iv = crypto.randomBytes(16); // Vector de inicialización (IV)
+
+// 👉 Encriptar contraseña
 export function encriptarPassword(password) {
-    // Genera un salt aleatorio
-    const salt = crypto.randomBytes(32).toString("hex");
-    // Genera un hash utilizando scryptSync con el salt y la contraseña
-    const hash = crypto.scryptSync(password, salt, 10, 64, "sha512").toString("hex");
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(password, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
     return {
-        salt,
-        hash
+        encrypted, // Contraseña encriptada
+        iv: iv.toString('hex'),
+        key: key.toString('hex')
+    };
+}
+
+// ✅ Validar contraseña
+export function validarPassword(password, encrypted, iv, key) {
+    try {
+        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted === password;
+    } catch (error) {
+        console.error("Error al validar la contraseña:", error);
+        return false;
     }
 }
 
-// Genera un hash utilizando scryptSync con el salt y la contraseña
-export function validarPassword(password, salt, hash) {
-    // Genera el hash con la contraseña ingresada y el salt
-    const hashEvaluar = crypto.scryptSync(password, salt, 10, 64, "sha512").toString("hex");
-    // Compara el hash generado con el hash almacenado
-    return hashEvaluar == hash;
+// 🔓 Desencriptar contraseña
+export function desencriptarPassword(encrypted, iv, key) {
+    try {
+        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
+        let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+    } catch (error) {
+        console.error("Error al desencriptar la contraseña:", error);
+        return null;
+    }
 }
 
 // Función para verificar si un usuario está autorizado
