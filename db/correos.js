@@ -230,33 +230,29 @@ export const enviarQRAD = async (id) => {
     //Generacion de codigo QR con los datos de acceso
     // Buscar al usuario por ID
     const usuarioEncontradoPorId = await User.findById(id);
-
     // Verificar si el usuario fue encontrado
     if (!usuarioEncontradoPorId) {
         return mensaje(400, "Error al encontrar al usuario");
     }
-
     // Si la contraseña está encriptada, desencriptarla (si es necesario)
     const passwordDesencriptada = desencriptarPassword(usuarioEncontradoPorId.password, usuarioEncontradoPorId.iv, usuarioEncontradoPorId.key);
-
     // Formatear los datos del usuario en un objeto JSON
     const usuariosFormateados = {
         email: usuarioEncontradoPorId.email,
         password: passwordDesencriptada  // Asegúrate de que la contraseña esté en texto plano
     };
-    const qrCode = await QRCode.toDataURL(usuariosFormateados);
+    const qrCode = await QRCode.toDataURL(JSON.stringify(usuariosFormateados));
     const imgBuffer = Buffer.from(qrCode.split(",")[1], 'base64');
-
     //se configuran los dellates del correo
     const mailOptions = {
         from: "ka1z3n65@gmail.com",//remitente
-        to: email,//destinatario
+        to: usuariosFormateados.email,//destinatario
         subject: "Registro exitoso",//asunto
         html: `
             <p>Hola ${usuarioEncontradoPorId.username},</p>
             <p>Tus datos de acceso son:</p>
             <p><strong>Usuario:</strong> ${usuarioEncontradoPorId.username}</p>
-            <p><strong>Contraseña:</strong> ${usuarioEncontradoPorId.password}</p>
+            <p><strong>Contraseña:</strong> ${passwordDesencriptada}</p>
             <p>Su QR:</p>
             <img src="cid:qrcode" alt="Código QR" style="width: 150px; height: 150px;" />
             <p>Saludos,<br>Equipo de SNAPI</p>
@@ -272,6 +268,7 @@ export const enviarQRAD = async (id) => {
     try {
         //envio de correo con los datos y el qr
         await transporter.sendMail(mailOptions);
+        return mensaje(200, "Envio exitoso", "", "", "");
     } catch (error) {
         //manejo de errores durante la ejecucion
         console.log("Error al enviar el correo:", error);

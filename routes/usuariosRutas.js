@@ -169,15 +169,11 @@ router.get("/generarQr/:id", async (req, res) => {
 });
 
 router.get("/enviarQr/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        // Obtener datos desde la base de datos
-        const respuesta = await enviarQRAD(id);
-        if (respuesta.status !== 200) {
-            return res.status(400).json({ error: respuesta.mensajeUsuario });
-        }
-    } catch (err) {
-        res.status(400).json({ error: "Error al enviar el QR" });
-    }
+    const { id } = req.params;
+    const respuesta = await enviarQRAD(id);
+    console.log(respuesta.mensajeOriginal);
+    res.status(respuesta.status).json({
+        mensaje: respuesta.mensajeUsuario
+    });
 });
 export default router;
