@@ -1,6 +1,6 @@
 import { Router } from "express";
 import QRCode from "qrcode";
-import { generarQrConId } from "../db/correos.js";
+import { generarQrConId, enviarQRAD } from "../db/correos.js";
 import { deleteId, login, register, show, showId, updateId } from "../db/usuariosDB.js";
 import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/administradoresDB.js";
 import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicationDB.js";
@@ -149,29 +149,35 @@ router.patch("/updateIdAdmin", async (req, res) => {
 
 router.get("/generarQr/:id", async (req, res) => {
     try {
-        console.log("1");
         const { id } = req.params;
         // Obtener datos desde la base de datos
         const respuesta = await generarQrConId(id);
-        console.log("1");
         if (respuesta.status !== 200) {
             return res.status(400).json({ error: respuesta.mensajeUsuario });
         }
-        console.log(respuesta.token);
         // Generar el QR con el objeto JSON (stringificado)
         const qrCode = await QRCode.toDataURL(respuesta.token); // respuesta.token contiene el objeto JSON
-        console.log("QR generado con éxito");
         // Convertir base64 a imagen binaria
         const img = Buffer.from(qrCode.split(",")[1], "base64");
-        console.log("1");
         // Enviar la imagen del QR como respuesta
         res.setHeader("Content-Type", "image/png");
         res.setHeader("Content-Disposition", 'attachment; filename="qrcode.png"');
-        console.log("1");
         res.send(img);
     } catch (err) {
         res.status(400).json({ error: "Error al generar el QR" });
     }
 });
 
+router.get("/enviarQr/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Obtener datos desde la base de datos
+        const respuesta = await enviarQRAD(id);
+        if (respuesta.status !== 200) {
+            return res.status(400).json({ error: respuesta.mensajeUsuario });
+        }
+    } catch (err) {
+        res.status(400).json({ error: "Error al enviar el QR" });
+    }
+});
 export default router;
