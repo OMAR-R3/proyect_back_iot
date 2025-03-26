@@ -60,8 +60,14 @@ export const login = async ({ email, password }) => {
             sonName: usuarioEncontrado.sonName,
             email: usuarioEncontrado.email
         });
+        const usuario = {
+            id: usuarioEncontrado._id,
+            username: usuarioEncontrado.username,
+            sonName: usuarioEncontrado.sonName,
+            email: usuarioEncontrado.email
+        };
         //retorna mensaje de exito con el token
-        return mensaje(200, "Logueado con exito", "", "", token);
+        return mensaje(200, usuario, "", "", token);
     } catch (error) {
         //manejo de errores
         return mensaje(400, "error al logearse", error);//en caso de fallo devuelve error
