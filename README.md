@@ -1,3 +1,14 @@
+Dependencias a instalar:
+"cookie-parser"
+"cors"
+"dotenv"
+"express"
+"jsonwebtoken"
+"mongoose"
+"node-cron"
+"nodemailer"
+"qrcode"
+
 index.js-archivo
 
 ![1](https://github.com/user-attachments/assets/8b660a5b-3e23-4038-bc56-a3643a713061)
