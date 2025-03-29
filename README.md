@@ -327,3 +327,7 @@ Permite a un administrador eliminar a otro administrador del sistema, lo que es 
 ![21](https://github.com/user-attachments/assets/6803dd07-7778-49d8-9290-3a7f13dab45d)
 
 Permite actualizar la información de un administrador.
+
+![22](https://github.com/user-attachments/assets/596e928a-3d82-4a99-b27a-ee67af4e0bf3)
+
+Funcion utlizada para borrar todas las ubicaciones y ahorrar memoria en la base de datos
