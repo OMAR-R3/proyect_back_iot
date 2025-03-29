@@ -5,7 +5,6 @@ Dependencias a instalar:
 "express"
 "jsonwebtoken"
 "mongoose"
-"node-cron"
 "nodemailer"
 "qrcode"
 
@@ -32,13 +31,6 @@ Este código define una función registerAdmin para registrar un administrador e
 Primero, verifica si el nombre de usuario o el correo electrónico ya están registrados para evitar duplicados, si no se encuentran duplicados, encripta la contraseña del administrador antes de almacenarla junto con el nombre de usuario y el correo electrónico en la base de datos. 
 Después, genera un token JWT con la información del administrador, lo que permite la autenticación en futuras solicitudes. 
 Luego, envía un correo al nuevo administrador con los detalles de su registro. Si todo el proceso es exitoso, la función retorna un mensaje con el token generado; si ocurre un error, retorna un mensaje de error.
-
-![2](https://github.com/user-attachments/assets/6b09d88a-3f01-426d-b52f-2702208f1431)
-
-Este código define una función loginAdmin para validar el inicio de sesión de un administrador.
-Primero, busca al administrador en la base de datos mediante el correo electrónico proporcionado, si no se encuentra el administrador, devuelve un error.
-Luego, valida la contraseña utilizando un proceso de verificación con el "salt" y la contraseña almacenada si la contraseña es incorrecta, también se devuelve un error si ambos datos son correctos, genera un token JWT con la información del administrador para permitir la autenticación en futuras solicitudes.
-Finalmente, si el proceso es exitoso, devuelve un mensaje con el tipo de usuario y el token generado, si ocurre algún error, se maneja y se devuelve un mensaje de error.
 
 ![3](https://github.com/user-attachments/assets/a9e49852-0ba4-4b49-a3f7-73818061096d)
 
@@ -243,16 +235,6 @@ El proceso de validación del token en la función usuarioAutorizado, si el toke
 Funcion de desencriptar password, usa la informacion guardada dentro de la base de datos para recuperar la contraseña original 
 Esto permite facilitar la creacion de qr en otras funciones
 
-
-![3](https://github.com/user-attachments/assets/5ec7248b-8a4f-4f45-9b70-4c9701a316e6)
-
-Manejo de Respuesta en usuarioAutorizado:
-Está verificando respuesta.status !== 200, lo cual está bien, sin embargo, sería más limpio si usuarioAutorizado sólo devolviera el usuario o un error, sin necesidad de revisar un status numérico, porque el control de errores se podría manejar con promesas.
-Uso de la Función showId:
-La función showId devuelve un mensaje para facilitar el procesamiento posterior, si el usuario no es encontrado, estás devolviendo un mensaje que podría no ser necesario en esta parte del flujo.
-Verificación del Rol:
-El código que verifica el tipo de usuario (tipoUsuario) es correcto, se asegura de que el campo tipoUsuario sea un booleano o un valor que indique claramente si es un administrador.
-
 models-carpeta
 administradorModelo.js-archivo
 
@@ -314,18 +296,6 @@ Esta ruta permite actualizar la información de un usuario específico, como su 
 
 Se utiliza para cerrar la sesión del usuario.
 
-![10](https://github.com/user-attachments/assets/9ba59318-24c3-4a17-9956-762f6984cd8d)
-
-Esta ruta se utiliza para cerrar la sesión de un usuario, eliminando su token de sesión.
-
-![11](https://github.com/user-attachments/assets/5b8936a9-5414-4776-96b3-50d0bd858c6e)
-
-Verifica si un usuario está autenticado en el sistema al revisar la validez de su token.
-
-![12](https://github.com/user-attachments/assets/027560d7-6597-43ce-b0df-96ad8ba58526)
-
-Esta ruta es accesible sin necesidad de autentificación.
-
 ![13](https://github.com/user-attachments/assets/68fb09d0-b388-4488-b42e-2dc882bdf0e7)
 
 Esta ruta permite el registro de una nueva ubicación.
@@ -342,10 +312,6 @@ Muestra los detalles de una ubicación específica mediante el ID.
 
 Permite a un administrador registrar a otro administrador en el sistema.
 
-![17](https://github.com/user-attachments/assets/8387b44d-bd92-4713-b964-06330751de6b)
-
-Permite a un administrador iniciar sesión en el sistema utilizando sus credenciales.
-
 ![18](https://github.com/user-attachments/assets/c5ca3831-47ee-4470-8371-cbdea36f712e)
 
 Permite a los administradores visualizar todos los administradores registrados en el sistema.
@@ -361,10 +327,3 @@ Permite a un administrador eliminar a otro administrador del sistema, lo que es 
 ![21](https://github.com/user-attachments/assets/6803dd07-7778-49d8-9290-3a7f13dab45d)
 
 Permite actualizar la información de un administrador.
-
-task-carpeta
-cronTask.js
-![1](https://github.com/user-attachments/assets/11a86fb3-c71a-4527-8d6f-29f8df422a7b)
-
-Este módulo utiliza **node-cron** para programar la tarea para borrar las ubicaciones de la base de datos en MongoDB Atlas a media noche todos los días. La tarea está programada con la expresión cron **'0 0 * * *'**, lo que permite que se ejecute todos los días a las **00:00** horas (medianoche).
-Dentro se utiliza el modelo **Ubication** para así eliminar todas las ubicaciones en la base de datos utilizando el método **deleteMany({})**.
