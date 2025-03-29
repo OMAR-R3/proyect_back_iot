@@ -176,4 +176,16 @@ router.get("/enviarQr/:id", async (req, res) => {
         mensaje: respuesta.mensajeUsuario
     });
 });
+
+// Ruta para borrar todas las ubicaciones
+router.delete("/deleteAllUbications", async (req, res) => {
+    try {
+        const respuesta = await Ubication.deleteMany({});
+        console.log("Todas las ubicaciones han sido borradas.");
+        res.status(200).json({ mensaje: "Todas las ubicaciones han sido borradas correctamente." });
+    } catch (error) {
+        console.error("Error al borrar las ubicaciones:", error);
+        res.status(500).json({ error: "Error al borrar las ubicaciones." });
+    }
+});
 export default router;
