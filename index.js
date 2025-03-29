@@ -5,7 +5,6 @@ import https from "https";
 import fs from "fs";
 import usuariosRutas from "./routes/usuariosRutas.js";
 import { conectarDB } from "./db/db.js";
-import './tasks/cronTasks.js';
 
 async function conexionBD() {
     const mensajeDB = await conectarDB();

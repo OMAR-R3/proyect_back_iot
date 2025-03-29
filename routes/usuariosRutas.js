@@ -2,7 +2,7 @@ import { Router } from "express";
 import QRCode from "qrcode";
 import { generarQrConId, enviarQRAD } from "../db/correos.js";
 import { deleteId, login, register, show, showId, updateId } from "../db/usuariosDB.js";
-import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin, loginAdmin } from "../db/administradoresDB.js";
+import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin} from "../db/administradoresDB.js";
 import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicationDB.js";
 import { log } from "console";
 const router = Router();
