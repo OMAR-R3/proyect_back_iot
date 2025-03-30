@@ -22,6 +22,8 @@ export const register = async ({ username, sonName, email, password }) => {
         //resgistro de usuario en mongo
         const respuestaMongo = await dataUser.save();
         //Se crea el token para devolverlo con la informacion del usuario
+        console.log("1");
+        
         const token = await crearToken({
             id: respuestaMongo._id,
             username: respuestaMongo.username,
@@ -29,7 +31,10 @@ export const register = async ({ username, sonName, email, password }) => {
             email: respuestaMongo.email
         });
         //enviar correo
+        console.log("2");
+        
         await enviarCorreoRegistro(email, username, passwordOriginal);
+        console.log("3");
         //retorna mensaje de exito con el token
         return mensaje(200, "Usuario registrado con exito", "", "", token);
     } catch (error) {
