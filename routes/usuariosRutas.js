@@ -3,10 +3,11 @@ import QRCode from "qrcode";
 import { generarQrConId, enviarQRAD } from "../db/correos.js";
 import { deleteId, login, register, show, showId, updateId } from "../db/usuariosDB.js";
 import { registerAdmin, showAdmins, showIdAdmin, deleteIdAdmin, updateIdAdmin} from "../db/administradoresDB.js";
-import { ubicationRegister, showUbication, showUbicationId } from "../db/ubicationDB.js";
+import { ubicationRegister, showUbication, showUbicationId, deleteAllUbications } from "../db/ubicationDB.js";
 import { log } from "console";
 const router = Router();
 import { adminAutorizado, usuarioAutorizado } from "../middlewares/funcionesPassword.js";
+import { mensaje } from "../libs/mensajes.js";
 // Rutas para gestión de usuarios
 // Registro de usuario
 router.post("/registro", async (req, res) => {
@@ -179,13 +180,10 @@ router.get("/enviarQr/:id", async (req, res) => {
 
 // Ruta para borrar todas las ubicaciones
 router.delete("/deleteAllUbications", async (req, res) => {
-    try {
-        const respuesta = await Ubication.deleteMany({});
-        console.log("Todas las ubicaciones han sido borradas.");
-        res.status(200).json({ mensaje: "Todas las ubicaciones han sido borradas correctamente." });
-    } catch (error) {
-        console.error("Error al borrar las ubicaciones:", error);
-        res.status(500).json({ error: "Error al borrar las ubicaciones." });
-    }
+    const respuesta = await deleteAllUbications();
+    console.log(respuesta.mensajeUsuario);
+    res.status(respuesta.status).json({
+        mensaje: respuesta.mensajeUsuario
+    });
 });
 export default router;

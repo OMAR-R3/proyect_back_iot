@@ -1,3 +1,4 @@
+import { mensaje } from "../libs/mensajes.js";
 import Ubication from "../models/ubicacionesModelo.js";
 // Función para registrar una nueva ubicación o actualizar una existente
 export const ubicationRegister = async ({ idUsuario, idDispositivo, longitud, latitud }) => {
@@ -56,3 +57,13 @@ export const showUbicationId = async (_id) => {
         return { status: 500, mensajeUsuario: "Error al buscar ubicación", error };
     }
 };
+
+export const deleteAllUbications = async ()=> {
+    try {
+        const ubicacionesEliminadas = await Ubication.deleteMany({});
+        if(!ubicacionesEliminadas) {return mensaje(400,"Ubicaciones no borradas")}
+        return mensaje(200, "Todas las ubicaciones borradas");
+    } catch (error) {
+        return {status:400, mensajeUsuario:"Error al borrar las ubicaciones",datos:error}
+    }
+}
