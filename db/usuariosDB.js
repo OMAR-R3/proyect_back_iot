@@ -1,18 +1,21 @@
 import User from "../models/usuarioModelo.js";
-import Ubication from "../models/ubicacionesModelo.js";
 import { mensaje } from "../libs/mensajes.js";
 import { crearToken } from "../libs/jwt.js";
+import nodemailer from "nodemailer";
 import { encriptarPassword, validarPassword } from "../middlewares/funcionesPassword.js";
 
 
-
-export const register = async ({ username,sonName, email, password }) => {
+export const register = async ({ username, sonName, email, password }) => {
     try {
         const usuarioDuplicado = await User.findOne({ username });
         const emailDuplicado = await User.findOne({ email });
         if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "usuario existente") };
+
+        // se guarda entes de encriptar
+        const passwordOriginal = password;
+
         const { salt, hash } = encriptarPassword(password);
-        const dataUser = new User({ username, sonName,email, password: hash, salt });
+        const dataUser = new User({ username, sonName, email, password: hash, salt });
         const respuestaMongo = await dataUser.save();
 
         const token = await crearToken({
@@ -23,16 +26,41 @@ export const register = async ({ username,sonName, email, password }) => {
             email: respuestaMongo.email
         });
 
-        //console.log("usuario guardado correctamente");
+        //enviar correo
+        await enviarCorreoRegistro(email, username, passwordOriginal);
+
+
+
         return mensaje(200, respuestaMongo.tipoUsuario, "", "", token);
 
     } catch (error) {
         return mensaje(400, "error usuario no registrado", error);
-
     }
-}
+};
 
+const enviarCorreoRegistro = async (email, username, password) => {
 
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "ka1z3n65@gmail.com",
+            pass: "dsewwbkgjkckefuo"
+        }
+    });
+    const mailOptions = {
+        from: "ka1z3n65@gmail.com",
+        to: email,
+        subject: "Registro exitoso",
+        text: `Hola ${username},\n\nTu cuenta ha sido creada con éxito.\n\nUsuario: ${username}\nContraseña: ${password}\n\nSaludos, Equipo de SNAPI.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.log(error);
+    }
+
+};
 
 
 export const crearUsuario = async ({ username, email, password }) => {
@@ -41,12 +69,10 @@ export const crearUsuario = async ({ username, email, password }) => {
         const emailDuplicado = await User.findOne({ email });
         if (usuarioDuplicado || emailDuplicado) { return mensaje(400, "usuario existente") };
         const { salt, hash } = encriptarPassword(password);
-        const dataUser = new User({ username, sonName,email, password: hash, salt });
+        const dataUser = new User({ username, sonName, email, password: hash, salt });
         const respuestaMongo = await dataUser.save();
 
-        const token = await crearToken({id: respuestaMongo._id});
-
-        //console.log("usuario guardado correctamente");
+        const token = await crearToken({ id: respuestaMongo._id });
         return mensaje(200, "usuario creado por admin", "", "", token);
 
     } catch (error) {
@@ -71,13 +97,10 @@ export const login = async ({ username, password }) => {
             tipoUsuario: respuestaMongo.tipoUsuario,
             email: respuestaMongo.email
         });
-        //const token = await crearToken({ id: usuarioEncontrado._id });
-
-        //console.log(mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token));
 
         return mensaje(200, usuarioEncontrado.tipoUsuario, "", "", token);
 
-        
+
     } catch (error) {
         return mensaje(400, "error al logearse", error);
     }
@@ -97,8 +120,6 @@ export const showId = async (_id) => {
 
     try {
         const usuarioEncontrado = await User.findOne({ _id });
-        //console.log(usuarioEncontrado);
-
         if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
 
         return mensaje(200, "usuario encontrado", usuarioEncontrado);
@@ -150,20 +171,6 @@ export const updateId = async ({ _id, sonName, email, password, tipoUsuario }) =
     }
 }
 
-/*export const isAdmin = async (id)=>{
-    try {
-        const usuario = await User.findById(id);
-        if(usuario.tipoUsuario!="admin"){
-            return false;
-        }
-        else{
-            return true;
-        }
-    } catch (error) {
-        return mensaje(400,"4 Admin no autorizado",error);
-    }
-}*/
-
 export const isAdmin = async (id) => {
     try {
         const usuario = await User.findById(id);
@@ -178,33 +185,30 @@ export const isAdmin = async (id) => {
 
 //ubicaciones
 
-
-export const ubicationRegister = async ({idDispositivo, idUsuario, /*dateTime,*/ longitud,latitud}) => {
+export const ubicationRegister = async ({ idDispositivo, idUsuario, /*dateTime,*/ longitud, latitud }) => {
     try {
-        const usuarioEncontrado = await User.findOne({ idUsuario });
-        const dispositivoEncontrado = await User.findOne({ idDispositivo });//hacer funcion de buscar dispositivo
+        const usuarioEncontrado = await Ubication.findOne({ idUsuario });
+        const dispositivoEncontrado = await Ubication.findOne({ idDispositivo });//hacer funcion de buscar dispositivo
 
         if (usuarioEncontrado || dispositivoEncontrado) { return mensaje(400, "no es posible el registro usuario o dispositivo inexistentes") };
 
-        const dataDispo = new Ubication({ idUsuario, idDispositivo,/* dateTime,*/ longitud,latitud});
+        const dataDispo = new Ubication({ idUsuario, idDispositivo,/* dateTime,*/ longitud, latitud });
 
         const respuestaMongo = await dataDispo.save();
 
-        //console.log("usuario guardado correctamente");
         return mensaje(200, "datos de ubicacion guardados", "", "", "");
 
     } catch (error) {
-        return mensaje(400, "error usuario no registrado", error);
+        return mensaje(400, "error ubicacion no registrado", error);
 
     }
 }
 
-
 export const showUbication = async () => {
     try {
-        const ubicaciones = await User.find().lean();
-        if (!usuarios.length) { return mensaje(400, "no se encontraron usuarios") }
-        return mensaje(200, "usuarios encontrados", usuarios)
+        const ubicaciones = await Ubication.find().lean();
+        if (!ubicaciones.length) { return mensaje(400, "no se encontraron usuarios") }
+        return mensaje(200, "ubicaciones encontradas", ubicaciones)
     } catch (error) {
         return mensaje(400, "error al traer los registros", error);
     }
@@ -213,12 +217,10 @@ export const showUbication = async () => {
 export const showUbicationId = async (_id) => {
 
     try {
-        const usuarioEncontrado = await User.findOne({ _id });
-
-        if (!usuarioEncontrado) { return mensaje(400, "usuario no encontrado") }
-
-        return mensaje(200, "usuario encontrado", usuarioEncontrado);
+        const ubicacionEncontrado = await Ubication.findOne({ _id });
+        if (!ubicacionEncontrado) { return mensaje(400, "ubicacion no encontrada") }
+        return mensaje(200, "ubicacion encontrada", usuarioEncontrado);
     } catch (error) {
-        return mensaje(400, "error al buscar usuario", error);
+        return mensaje(400, "error al buscar ubicacion", error);
     }
 }
